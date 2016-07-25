@@ -1,0 +1,186 @@
+/** Operating establishments */
+var exp_opratingestablishments_hotels = ["Operating establishments", "Hotels"];
+
+/** Guest rooms */
+var exp_guestrooms_hotels = ["Guest rooms", "Hotels"];
+
+/** Bedplaces */
+var exp_bedplaces_hotels = ["Bedplaces", "Hotels"];
+
+/** Average occupancy rate */
+var exp_averageoccupancyrate_hotels = ["Average occupancy rate", "Hotels"];
+
+/** No. of guests */
+/** Hotels */
+var exp_noofguests_hotels_5starhotels_Asia = ["No. of guests", "Hotels", "5-star hotels", "Asia"];
+var exp_noofguests_hotels_5starhotels_usofamericaandcanada = ["No. of guests", "Hotels", "5-star hotels", "United States of America & Canada"];
+var exp_noofguests_hotels_5starhotels_Europe = ["No. of guests", "Hotels", "5-star hotels", "Europe"];
+var exp_noofguests_hotels_5starhotels_ausnewzealand = ["No. of guests", "Hotels", "5-star hotels", "Australia & New Zealand"];
+
+var exp_noofguests_hotels_4starhotels_Asia = ["No. of guests", "Hotels", "4-star hotels", "Asia"];
+var exp_noofguests_hotels_4starhotels_usofamericaandcanada = ["No. of guests", "Hotels", "4-star hotels", "United States of America & Canada"];
+var exp_noofguests_hotels_4starhotels_Europe = ["No. of guests", "Hotels", "4-star hotels", "Europe"];
+var exp_noofguests_hotels_4starhotels_ausnewzealand = ["No. of guests", "Hotels", "4-star hotels", "Australia & New Zealand"];
+
+var exp_noofguests_hotels_3starhotels_Asia = ["No. of guests", "Hotels", "3-star hotels", "Asia"];
+var exp_noofguests_hotels_3starhotels_usofamericaandcanada = ["No. of guests", "Hotels", "3-star hotels", "United States of America & Canada"];
+var exp_noofguests_hotels_3starhotels_Europe = ["No. of guests", "Hotels", "3-star hotels", "Europe"];
+var exp_noofguests_hotels_3starhotels_ausnewzealand = ["No. of guests", "Hotels", "3-star hotels", "Australia & New Zealand"];
+
+var exp_noofguests_hotels_2starhotels_Asia = ["No. of guests", "Hotels", "2-star hotels", "Asia"];
+var exp_noofguests_hotels_2starhotels_usofamericaandcanada = ["No. of guests", "Hotels", "2-star hotels", "United States of America & Canada"];
+var exp_noofguests_hotels_2starhotels_Europe = ["No. of guests", "Hotels", "2-star hotels", "Europe"];
+var exp_noofguests_hotels_2starhotels_ausnewzealand = ["No. of guests", "Hotels", "2-star hotels", "Australia & New Zealand"];
+/** Guests House */
+
+var exp_noofguests_guests_Asia = ["No. of guests", "Guest-houses", "Asia"];
+var exp_noofguests_guests_usofamericaandcanada = ["No. of guests", "Guest-houses", "United States of America & Canada"];
+var exp_noofguests_guests_Europe = ["No. of guests", "Guest-houses", "Europe"];
+var exp_noofguests_guests_ausnewzealand = ["No. of guests", "Guest-houses", "Australia & New Zealand"];
+
+/** No. of guests through travel agencies */
+var exp_noofgueststa_hotels = ["No. of guests through travel agencies", "Hotels"];
+
+
+async.forEachOfSeries(toExpand, function (value, index, next) {
+            driver.wait(function () {
+                return driver.isElementPresent(by.xpath("//a[text()='" + value + "']")).then(function (present) {
+                    return present;
+                })
+            }, 50000).then(function () {
+                var item = driver.findElement(by.xpath("//a[text()='" + value + "']"));
+                item.getId().then(function (id) {
+                    if (already.indexOf(id) == -1) {
+                        driver.findElement(by.xpath("//a[text()='" + value + "']")).click().then(function () {
+                            setTimeout(function () {
+                                console.log(value + ' expanded');
+                                already.push(id);
+                                next();
+                                if (index == toExpand.length - 1) {
+                                    callback();
+                                }
+                            }, 500);
+                        });
+                    } else {
+                        setTimeout(function () {
+                                console.log(value + ' already expanded');
+                                next();
+                                if (index == toExpand.length - 1) {
+                                    callback();
+                                }
+                            }, 500);
+                    }
+                });
+
+
+            });
+        });
+
+
+        /** Base */
+var exp_tourismandservice = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t12';
+var exp_tourism = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t20';
+var exp_hotelandguesthouse = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t28';
+
+/** Operating establishments */
+var exp_opratingestablishments = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t32';
+var exp_opratingestablishments_hotels = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t41';
+
+/** Guest rooms */
+var exp_guestrooms = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t33';
+var exp_guestrooms_hotels = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t47';
+
+/** Bedplaces */
+var exp_bedplace = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t34';
+var exp_bedplaces_hotels = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t53';
+
+/** Average occupancy rate */
+var exp_averageoccupancyrate = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t35';
+var exp_averageoccupancyrate_hotels = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t59';
+
+/** No. of guests */
+/** Hotels */
+var exp_noofguests = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t37';
+var exp_noofguests_hotels = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t62';
+
+var exp_noofguests_hotels_5starhotels = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t65';
+var exp_noofguests_hotels_5starhotels_Asia = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t73';
+var exp_noofguests_hotels_5starhotels_usofamericaandcanada = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t74';
+var exp_noofguests_hotels_5starhotels_Europe = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t75';
+var exp_noofguests_hotels_5starhotels_ausnewzealand = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t76';
+
+var exp_noofguests_hotels_4starhotels = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t66';
+var exp_noofguests_hotels_4starhotels_Asia = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t83';
+var exp_noofguests_hotels_4starhotels_usofamericaandcanada = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t84';
+var exp_noofguests_hotels_4starhotels_Europe = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t85';
+var exp_noofguests_hotels_4starhotels_ausnewzealand = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t86';
+
+var exp_noofguests_hotels_3starhotels = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t67';
+var exp_noofguests_hotels_3starhotels_Asia = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t106';
+var exp_noofguests_hotels_3starhotels_usofamericaandcanada = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t107';
+var exp_noofguests_hotels_3starhotels_Europe = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t108';
+var exp_noofguests_hotels_3starhotels_ausnewzealand = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t109';
+
+var exp_noofguests_hotels_3starhotels = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t68';
+var exp_noofguests_hotels_2starhotels_Asia = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t111';
+var exp_noofguests_hotels_2starhotels_usofamericaandcanada = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t112';
+var exp_noofguests_hotels_2starhotels_Europe = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t113';
+var exp_noofguests_hotels_2starhotels_ausnewzealand = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t114';
+/** Guests House */
+
+var exp_noofguests_guests_Asia = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t88';
+var exp_noofguests_guests_usofamericaandcanada = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t89';
+var exp_noofguests_guests_Europe = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t90';
+var exp_noofguests_guests_ausnewzealand = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t91';
+
+/** No. of guests through travel agencies */
+var exp_noofgueststa = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t38';
+var exp_noofgueststa_hotels = 'plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_DSECTreeViewEx1t116';
+
+
+
+
+driver.wait(function () {
+            return driver.isElementPresent(by.xpath("//a[contains(@href, '" + toExpand + "')]")).then(function (present) {
+                return present;
+            })
+        }, 10000).then(function () {
+            driver.findElement(by.xpath("//a[contains(@href, '" + toExpand + "')]")).click().then(function() {
+                setTimeout(function() {
+                    console.log(toExpand + ' was done');
+                    callback();
+                }, 3000);
+            });
+
+        });
+
+        /** Guest Rooms */
+var exp_guestrooms_hotels = baseMenu.concat(["Guest rooms", "Hotels"]);
+var ck_guestrooms_hotels_5star = 'chkSelect_0/1503/13001/13002/13004/25007/25008';
+var ck_guestrooms_hotels_4star = 'chkSelect_0/1503/13001/13002/13004/25007/25009';
+var ck_guestrooms_hotels_3star = 'chkSelect_0/1503/13001/13002/13004/25007/25010';
+var ck_guestrooms_hotels_2star = 'chkSelect_0/1503/13001/13002/13004/25007/25011';
+var GuestRooms_Hotel_Entity = {
+    toExpand: exp_guestrooms_hotels,
+    toCheck: [ck_guestrooms_hotels_5star, ck_guestrooms_hotels_4star, ck_guestrooms_hotels_3star, ck_guestrooms_hotels_2star]
+}
+
+/** No. of guests */
+var exp_noofguests_hotels_5tat_Asia = baseMenu.concat(["No. of guests", "Hotels", "5-star hotels", "Asia"]);
+var ck_noofguests_5tar_MainlandChina = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25095';
+var ck_noofguests_5tar_HongKong = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25096';
+var ck_noofguests_5tar_Macao = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25097';
+var ck_noofguests_5tar_TaiWan = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25098';
+var ck_noofguests_5tar_Japan = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25099';
+var ck_noofguests_5tar_India = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25100';
+var ck_noofguests_5tar_Indonesia = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25101';
+var ck_noofguests_5tar_Malaysia = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25102';
+var ck_noofguests_5tar_Philippines = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25103';
+var ck_noofguests_5tar_RepublicofKorea = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25104';
+var ck_noofguests_5tar_Singapore = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25105';
+var ck_noofguests_5tar_Thailand = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25106';
+var ck_noofguests_5tar_OtherAsianCountries = 'chkSelect_0/1503/13001/13002/13006/25063/25093/25094/25107';
+var GuestNumber_Hotel_Entity = {
+    toExpand: exp_noofguests_hotels_5tat_Asia,
+    toCheck: [ck_noofguests_5tar_MainlandChina, ck_noofguests_5tar_HongKong, ck_noofguests_5tar_Macao, ck_noofguests_5tar_TaiWan, ck_noofguests_5tar_Japan, ck_noofguests_5tar_India, ck_noofguests_5tar_Indonesia, ck_noofguests_5tar_Malaysia, ck_noofguests_5tar_Philippines, ck_noofguests_5tar_RepublicofKorea, ck_noofguests_5tar_Singapore, ck_noofguests_5tar_Thailand, ck_noofguests_5tar_OtherAsianCountries]
+}
