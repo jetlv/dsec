@@ -9,6 +9,7 @@ var fs = require('fs');
 var async = require('async');
 var baseMenu = ["Tourism and services", "Tourism", "Hotels & Guesthouses"];
 var request = require('request');
+var processor = require('./processor.js');
 
 
 /**
@@ -35,6 +36,10 @@ Date.prototype.Format = function (fmt) {
             fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
     return fmt;
 }
+
+/** define mos */
+
+var mos = require('./config.json').mos;
 
 /** Operating establishments */
 var exp_opratingestablishments_hotels = baseMenu.concat(["Operating establishments", "Hotels"]);
@@ -125,21 +130,22 @@ var ALGuestsHouse = [exp_alofguests_guests_Asia, exp_alofguests_guests_usofameri
 var folder = new Date().Format('yyyyMMddhhmmss') + '/';
 fs.mkdirSync(folder);
 
-async.series([function (callback) { singleQuery(OGBA, folder + 'OGBA.xls', callback) },
-    function (callback) { singleQuery(FiveSTAR, folder + 'FiveSTAR.xls', callback) },
-    function (callback) { singleQuery(FourSTAR, folder + 'FourSTAR.xls', callback) },
-    function (callback) { singleQuery(ThreeSTAR, folder + 'ThreeSTAR.xls', callback) },
-    function (callback) { singleQuery(TwoSTAR, folder + 'TwoSTAR.xls', callback) },
-    function (callback) { singleQuery(GuestsHouse, folder + 'GuestsHouse.xls', callback) },
-    function (callback) { singleQuery(NOGTA, folder + 'NOGTA.xls', callback) },
-    function (callback) { singleQuery(ALFiveStar, folder + 'ALFiveStar.xls', callback) },
-    function (callback) { singleQuery(ALFourStar, folder + 'ALFourStar.xls', callback) },
-    function (callback) { singleQuery(ALThreeStar, folder + 'ALThreeStar.xls', callback) },
-    function (callback) { singleQuery(ALTwoStar, folder + 'ALTwoStar.xls', callback) },
-    function (callback) { singleQuery(ALGuestsHouse, folder + 'ALGuestsHouse.xls', callback) }
+async.series([function (callback) { singleQuery(OGBA, folder + 'H_Inventory.xls', callback) },
+    function (callback) { singleQuery(FiveSTAR, folder + 'H_Guests_5Star.xls', callback) },
+    function (callback) { singleQuery(FourSTAR, folder + 'H_Guests_4Star.xls', callback) },
+    function (callback) { singleQuery(ThreeSTAR, folder + 'H_Guests_3Star.xls', callback) },
+    function (callback) { singleQuery(TwoSTAR, folder + 'H_Guests_2Star.xls', callback) },
+    function (callback) { singleQuery(GuestsHouse, folder + 'H_Guests_Guesthouse.xls', callback) },
+    function (callback) { singleQuery(NOGTA, folder + 'H_Guests_TA.xls', callback) },
+    function (callback) { singleQuery(ALFiveStar, folder + 'H_LOS_5Star.xls', callback) },
+    function (callback) { singleQuery(ALFourStar, folder + 'H_LOS_4Star.xls', callback) },
+    function (callback) { singleQuery(ALThreeStar, folder + 'H_LOS_3Star.xls', callback) },
+    function (callback) { singleQuery(ALTwoStar, folder + 'H_LOS_2Star.xls', callback) },
+    function (callback) { singleQuery(ALGuestsHouse, folder + 'H_LOS_Guesthouse.xls', callback) },
+    function(callback) {processor(folder, callback)} 
     ], function (err, result) {
         if (err) console.log(err);
-        console.log('All xls files fetched');
+        console.log('All xls files fetched and proccessed');
     });
 
 /**
@@ -260,9 +266,13 @@ function singleQuery(expandArray, savedName, nextQuery) {
             }).then(function () {
                 driver.findElement(by.id('plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_txtCustomizedReportTitle')).sendKeys(savedName.split('/')[1].split('.')[0]);
             }).then(function () {
-                driver.findElement(by.id('plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_chkYearlyDataPeriod')).click();
+                driver.findElement(by.id('plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_rdoDataByLatestRecords')).click();
             }).then(function () {
-                driver.findElement(by.id('plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_chkQuarterlyDataPeriod')).click();
+                driver.findElement(by.id('plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_txtDataLatestRecords_text')).clear();
+            }).then(function () {
+                driver.findElement(by.id('plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_txtDataLatestRecords_text')).sendKeys(mos);
+            }).then(function () {
+                driver.findElement(by.id('plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_chkMonthlyDataPeriod')).click();
             }).then(function () {
                 driver.saveScreenshot('pics/forminput.png');
             }).then(function () {
