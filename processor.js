@@ -1,7 +1,6 @@
 /// <reference path="./include.d.ts" />
 
 
-
 module.exports = function (folder, callback) {
 
     /** CONSTANT  */
@@ -19,7 +18,17 @@ module.exports = function (folder, callback) {
     const ALFILE_GUESTSHOUSE = 'H_LOS_Guesthouse.xls';
 
     /** define the months mapping */
-    const M = { "Jan.": "1", "Feb.": "2", "Mar.": "3", "Apr.": "4", "May": "5", "Jun.": "6", "Jul.": "7", "Aug.": "8", "Sept.": "9", "Oct.": "10", "Nov.": "11", "Dec.": "12" };
+    const M = { "Jan": "1", "Feb": "2", "Mar": "3", "Apr": "4", "May": "5", "Jun": "6", "Jul": "7", "Aug": "8", "Sep": "9", "Oct": "10", "Nov": "11", "Dec": "12" };
+
+    /** function to match the mos */
+    function _m(str) {
+        for(var mos in M) {
+            if(str.match(mos)) {
+                return M[str.match(mos)[0]];
+            }
+        }
+        return null;
+    } 
 
 
     var fs = require('fs');
@@ -46,14 +55,14 @@ module.exports = function (folder, callback) {
         if (index === 0) {
             return;
         }
-        if (!M[line[1]]) {
+        if ((!line[1]) || (line[1] && (!_m(line[1])))) {
             return;
         }
         if (line[0] && line[0].match(/\d+/)) {
             ogbaCurrentYear = line[0];
         }
 
-        var Date = ogbaCurrentYear + '/' + M[line[1]];
+        var dt = new Date(Date.UTC(ogbaCurrentYear, parseInt(_m(line[1])) -1 , 1, 0, 0, 0, 0));
 
         /** FiveStar */
         var fiveStarProperties = line[2];
@@ -61,7 +70,7 @@ module.exports = function (folder, callback) {
         var fiveStarBedPlaces = line[23];
         var fiveStarOccupancy = line[33];
         var fiveStarRow = [];
-        fiveStarRow.push(Date);
+        fiveStarRow.push(dt);
         fiveStarRow.push('5-star');
         fiveStarRow.push(fiveStarProperties);
         fiveStarRow.push(fiveStarRooms);
@@ -75,7 +84,7 @@ module.exports = function (folder, callback) {
         var fourStarBedPlaces = line[25];
         var fourStarOccupancy = line[35];
         var fourStarRow = [];
-        fourStarRow.push(Date);
+        fourStarRow.push(dt);
         fourStarRow.push('4-star');
         fourStarRow.push(fourStarProperties);
         fourStarRow.push(fourStarRooms);
@@ -89,7 +98,7 @@ module.exports = function (folder, callback) {
         var threeStarBedPlaces = line[27];
         var threeStarOccupancy = line[37];
         var threeStarRow = [];
-        threeStarRow.push(Date);
+        threeStarRow.push(dt);
         threeStarRow.push('3-star');
         threeStarRow.push(threeStarProperties);
         threeStarRow.push(threeStarRooms);
@@ -103,7 +112,7 @@ module.exports = function (folder, callback) {
         var twoStarBedPlaces = line[29];
         var twoStarOccupancy = line[39];
         var twoStarRow = [];
-        twoStarRow.push(Date);
+        twoStarRow.push(dt);
         twoStarRow.push('2-star');
         twoStarRow.push(twoStarProperties);
         twoStarRow.push(twoStarRooms);
@@ -117,7 +126,7 @@ module.exports = function (folder, callback) {
         var guestBedPlaces = line[31];
         var guestOccupancy = line[41];
         var guestRow = [];
-        guestRow.push(Date);
+        guestRow.push(dt);
         guestRow.push('GuestHouse');
         guestRow.push(guestProperties);
         guestRow.push(guestRooms);
@@ -168,13 +177,13 @@ module.exports = function (folder, callback) {
         if (index === 0) {
             return;
         }
-        if (!M[line[1]]) {
+        if ((!line[1]) || (line[1] && (!_m(line[1])))) {
             return;
         }
         if (line[0] && line[0].match(/\d+/)) {
             guestsYear = line[0];
         }
-        var Date = guestsYear + '/' + M[line[1]];
+        var dt = new Date(Date.UTC(guestsYear, parseInt(_m(line[1]))-1, 1, 0, 0, 0, 0));
         /** 5 star extracted row */
         // fs.appendFileSync('5starloc.txt', JSON.stringify(alFiveSheet.data[index]) + '\r\n');
         for (var country in C) {
@@ -182,7 +191,7 @@ module.exports = function (folder, callback) {
             var guests = line[C[country]];
             var loc = alFiveSheet.data[index][C[country]];
             var row = [];
-            row.push(Date);
+            row.push(dt);
             row.push('5-star');
             row.push(residence);
             row.push(guests);
@@ -195,21 +204,21 @@ module.exports = function (folder, callback) {
         if (index === 0) {
             return;
         }
-        if (!M[line[1]]) {
+        if ((!line[1]) || (line[1] && (!_m(line[1])))) {
             return;
         }
         if (line[0] && line[0].match(/\d+/)) {
             guestsYear = line[0];
         }
 
-        var Date = guestsYear + '/' + M[line[1]];
+        var dt = new Date(Date.UTC(guestsYear, parseInt(_m(line[1]))-1, 1, 0, 0, 0, 0));
         /** 4 star extracted row */
         for (var country in C) {
             var residence = country;
             var guests = line[C[country]];
             var loc = alFourSheet.data[index][C[country]];
             var row = [];
-            row.push(Date);
+            row.push(dt);
             row.push('4-star');
             row.push(residence);
             row.push(guests);
@@ -222,21 +231,21 @@ module.exports = function (folder, callback) {
         if (index === 0) {
             return;
         }
-        if (!M[line[1]]) {
+        if ((!line[1]) || (line[1] && (!_m(line[1])))) {
             return;
         }
         if (line[0] && line[0].match(/\d+/)) {
             guestsYear = line[0];
         }
 
-        var Date = guestsYear + '/' + M[line[1]];
+        var dt = new Date(Date.UTC(guestsYear, parseInt(_m(line[1]))-1, 1, 0, 0, 0, 0));
         /** 3 star extracted row */
         for (var country in C) {
             var residence = country;
             var guests = line[C[country]];
             var loc = alThreeSheet.data[index][C[country]];
             var row = [];
-            row.push(Date);
+            row.push(dt);
             row.push('3-star');
             row.push(residence);
             row.push(guests);
@@ -249,21 +258,21 @@ module.exports = function (folder, callback) {
         if (index === 0) {
             return;
         }
-        if (!M[line[1]]) {
+        if ((!line[1]) || (line[1] && (!_m(line[1])))) {
             return;
         }
         if (line[0] && line[0].match(/\d+/)) {
             guestsYear = line[0];
         }
 
-        var Date = guestsYear + '/' + M[line[1]];
+        var dt = new Date(Date.UTC(guestsYear, parseInt(_m(line[1]))-1, 1, 0, 0, 0, 0));
         /** 2 star extracted row */
         for (var country in C) {
             var residence = country;
             var guests = line[C[country]];
             var loc = alTwoSheet.data[index][C[country]];
             var row = [];
-            row.push(Date);
+            row.push(dt);
             row.push('2-star');
             row.push(residence);
             row.push(guests);
@@ -276,21 +285,21 @@ module.exports = function (folder, callback) {
         if (index === 0) {
             return;
         }
-        if (!M[line[1]]) {
+        if ((!line[1]) || (line[1] && (!_m(line[1])))) {
             return;
         }
         if (line[0] && line[0].match(/\d+/)) {
             guestsYear = line[0];
         }
 
-        var Date = guestsYear + '/' + M[line[1]];
+        var dt = new Date(Date.UTC(guestsYear, parseInt(_m(line[1]))-1, 1, 0, 0, 0, 0));
         /** 2 star extracted row */
         for (var country in C) {
             var residence = country;
             var guests = line[C[country]];
             var loc = alGuestSheet.data[index][C[country]];
             var row = [];
-            row.push(Date);
+            row.push(dt);
             row.push('GuestHouses');
             row.push(residence);
             row.push(guests);
@@ -313,50 +322,46 @@ module.exports = function (folder, callback) {
         if (index === 0) {
             return;
         }
-        if (!M[line[1]]) {
+        if ((!line[1]) || (line[1] && (!_m(line[1])))) {
             return;
         }
         if (line[0] && line[0].match(/\d+/)) {
             taYear = line[0];
         }
 
-
-        var Date = guestsYear + '/' + M[line[1]];
+        // var dt = new Date(_m(line[1]) + '/2/' + taYear);
+        var dt = new Date(Date.UTC(taYear, parseInt(_m(line[1]))-1, 1, 0, 0, 0, 0));
         var fiveStar_taNum = line[2];
         var tafiveStar_row = [];
-        tafiveStar_row.push(Date);
+        tafiveStar_row.push(dt);
         tafiveStar_row.push('5-star');
         tafiveStar_row.push(fiveStar_taNum);
         taWriter.data.push(tafiveStar_row);
 
-        var Date = guestsYear + '/' + M[line[1]];
         var fourStar_taNum = line[4];
         var tafourStar_row = [];
-        tafourStar_row.push(Date);
+        tafourStar_row.push(dt);
         tafourStar_row.push('4-star');
         tafourStar_row.push(fourStar_taNum);
         taWriter.data.push(tafourStar_row);
 
-        var Date = guestsYear + '/' + M[line[1]];
         var threeStar_taNum = line[6];
         var tathreeStar_row = [];
-        tathreeStar_row.push(Date);
+        tathreeStar_row.push(dt);
         tathreeStar_row.push('3-star');
         tathreeStar_row.push(threeStar_taNum);
         taWriter.data.push(tathreeStar_row);
 
-        var Date = guestsYear + '/' + M[line[1]];
         var twoStar_taNum = line[8];
         var tatwoStar_row = [];
-        tatwoStar_row.push(Date);
+        tatwoStar_row.push(dt);
         tatwoStar_row.push('2-star');
         tatwoStar_row.push(twoStar_taNum);
         taWriter.data.push(tatwoStar_row);
 
-        var Date = guestsYear + '/' + M[line[1]];
         var guestHouse_taNum = line[10];
         var taguestHouse_row = [];
-        taguestHouse_row.push(Date);
+        taguestHouse_row.push(dt);
         taguestHouse_row.push('GuestHouses');
         taguestHouse_row.push(guestHouse_taNum);
         taWriter.data.push(taguestHouse_row);
