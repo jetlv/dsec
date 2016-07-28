@@ -54,39 +54,11 @@ var selected_node = { plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder
 var indicator = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$txtSearchIndicator: '' };
 var dummy = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$HiddenDummy: '' };
 var event_checking = { __EVENTTARGET: 'plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$StartNavigationTemplateContainerID$StartNextLinkButton' };
-var eventarg_afterchecking = { __EVENTARGUMENT: '' };
+var eventarg_beforeChecking = { __EVENTARGUMENT: '' };
 var hidden = { HiddenFieldDocumentCulture: 'en-US' };
-var form_beforeChecking = Object.assign(ck1, ck2, ck3, ck4, ck5, event_checking, expanded, expanded_state, hidden, selected_node, indicator, dummy, eventarg_afterchecking);
-// console.log(form_afterChecking);
+var form_beforeChecking = Object.assign(ck1, ck2, ck3, ck4, ck5, event_checking, expanded, expanded_state, hidden, selected_node, indicator, dummy, eventarg_beforeChecking);
 
-
-var request = request.defaults({ proxy: 'http://127.0.0.1:8888' });
-
-request.get({ url: url, gzip: true }, function (err, resp, body) {
-    var $ = cheerio.load(body);
-    var cookie = __getSessions(resp);
-    regularHeaders.push({ "name": "Cookie", "value": cookie });
-    var viewState_beforeStart = $('#__VIEWSTATE').attr('value');
-    form_start = Object.assign(form_start, { __VIEWSTATE: viewState_beforeStart });
-    request({ har: { headers: regularHeaders, url: url, method: 'POST'} , gzip : true , form: form_start }, function (err, resp, body) {
-        var $ = cheerio.load(body);
-        // fs.appendFileSync('body.html', body);
-        var viewState_beforeChecking = $('#__VIEWSTATE').attr('value');
-        form_beforeChecking = Object.assign(form_beforeChecking, {__VIEWSTATE: viewState_beforeChecking});
-        console.log(form_beforeChecking);
-        request({ har: { headers: regularHeaders, url: url, method: 'POST'} , gzip :true, form: form_beforeChecking }, function (err, resp, body) {
-        });
-
-    });
-
-    // var form_afterChecking_final = Object.assign(form_afterChecking, {__VIEWSTATE : viewState});
-    // request({ har: { headers: regularHeaders, url: url, method: 'POST', gzip : true}, form: form_afterChecking_final }, function (err, resp, body) {
-    //     // fs.appendFileSync('body.html', body);
-    // });
-});
-
-
-
+/** before configuration  */
 var titleKey = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$txtCustomizedReportTitle: 'Name' };
 var formatKey = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$RadComboBoxFormat_Input: 'Table' };
 var formatKey_clientState = { plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_RadComboBoxFormat_ClientState: { "logEntries": [], "value": "REPORT", "text": "Table", "enabled": true } };
@@ -95,10 +67,48 @@ var paperSize_clientState = { plcRoot_Layout_zoneContent_pageplaceholder_partPla
 var orientation = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$RadComboBoxPaperOrientation_Input: 'Portrait' };
 var orientation_clientState = { clientplcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_RadComboBoxPaperOrientation_ClientState: { "logEntries": [], "value": "PORTRAIT", "text": "Portrait", "enabled": true } };
 var chartSeriesType_clientState = { plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_RadComboBoxChartSeriesType_ClientState: { "logEntries": [], "value": "LINE", "text": "Line Chart", "enabled": false } };
-/** output type  */
 var outputType = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$Data: 'rdoDataByLatestRecords' };
-/** latest mos */
 var mos = { plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_txtDataLatestRecords_text: 24 };
 var mos1 = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$txtDataLatestRecords: 24 };
-/** Monthly */
 var monthly = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$chkMonthlyDataPeriod: 'on' };
+var event_beforeConfiguration = {__EVENTTARGET: 'plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$StepNavigationTemplateContainerID$StepNextLinkButton'};
+var eventarg_beforeConfiguration = {__EVENTARGUMENT : ''};
+var form_beforeConfiguration = Object.assign(event_beforeConfiguration, eventarg_beforeConfiguration, titleKey, formatKey, formatKey_clientState, paperSize, paperSize_clientState, orientation, orientation_clientState, chartSeriesType_clientState, outputType, mos, mos1, monthly);
+
+/** download */
+var event_final = {__EVENTTARGET: 'plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$RadToolBar1'};
+var eventarg_final = {__EVENTARGUMENT : '2'};
+var unknowArg1 = {plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_RadToolBar1_ClientState:''};
+var unknowArg2 = {plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$txtSaveCustomizeReport : ''};
+var finalHidden = {HiddenFieldDocumentCulture: 'en-US'};
+var form_final = Object.assign(event_final, eventarg_final, unknowArg1, unknowArg2, finalHidden, lang);
+
+
+var request = request.defaults({ proxy: 'http://127.0.0.1:8888' });
+request.get({ url: url, gzip: true }, function (err, resp, body) {
+    var $ = cheerio.load(body);
+    var cookie = __getSessions(resp);
+    regularHeaders.push({ "name": "Cookie", "value": cookie });
+    var viewState_beforeStart = $('#__VIEWSTATE').attr('value');
+    form_start = Object.assign(form_start, { __VIEWSTATE: viewState_beforeStart });
+    request({ har: { headers: regularHeaders, url: url, method: 'POST' }, gzip: true, form: form_start }, function (err, resp, body) {
+        var $ = cheerio.load(body);
+        var viewState_beforeChecking = $('#__VIEWSTATE').attr('value');
+        form_beforeChecking = Object.assign(form_beforeChecking, { __VIEWSTATE: viewState_beforeChecking });
+        // console.log(form_beforeChecking);
+        request({ har: { headers: regularHeaders, url: url, method: 'POST' }, gzip: true, form: form_beforeChecking }, function (err, resp, body) {
+            var $ = cheerio.load(body);
+            var viewState_beforeConfiguration = $('#__VIEWSTATE').attr('value');
+            form_beforeConfiguration = Object.assign(form_beforeConfiguration, {__VIEWSTATE: viewState_beforeConfiguration});
+            request({ har: { headers: regularHeaders, url: url, method: 'POST' }, gzip: true, form: form_beforeConfiguration }, function (err, resp, body) {
+                var $ = cheerio.load(body);
+                var viewState_final = $('#__VIEWSTATE').attr('value');
+                form_final = Object.assign(form_final, { __VIEWSTATE: viewState_final});
+                request({ har: { headers: regularHeaders, url: url, method: 'POST' }, encoding : null, gzip: true, form: form_final}, function (err, resp, body) {    
+                    fs.writeFileSync('testResult.xls', body);
+                });
+            });
+        });
+    });
+});
+
