@@ -38,17 +38,32 @@ var __getSessions = function (resp) {
     return cookies.join("; ");
 }
 
-
-/**Same day arrival visitors */
-var runObjs = JSON.parse(fs.readFileSync('./cks/SameDayVisitor.json').toString());
-
 var folder = new Date().Format('yyyyMMddhhmmss') + '/';
 fs.mkdirSync(folder);
-async.mapLimit(runObjs, 2, function (runObj, callback) {
-    var filePath = folder + 'Same-Day Visitor_' + runObj.country + '.xls'
-    performOnce(filePath, runObj, callback);
-}, function (err) {
+/**Same day arrival visitors */
+function runSameDayVisitorArrival(next) {
+    var runObjs = JSON.parse(fs.readFileSync('./cks/SameDayVisitor.json').toString());
+    async.mapLimit(runObjs, 3, function (runObj, callback) {
+        var filePath = folder + 'Same-Day Visitor_' + runObj.country + '.xls'
+        performOnce(filePath, runObj, callback);
+    }, function (err) {
+        next();
+    });
+}
 
+/**Overnight arrival visitors */
+function runOvernightVisitorArrival(next) {
+    var runObjs = JSON.parse(fs.readFileSync('./cks/OvernightVisitor.json').toString());
+    async.mapLimit(runObjs, 3, function (runObj, callback) {
+        var filePath = folder + 'Overnight Visitor_' + runObj.country + '.xls'
+        performOnce(filePath, runObj, callback);
+    }, function (err) {
+        next();
+    });
+}
+
+async.series([async.apply(runSameDayVisitorArrival), async.apply(runOvernightVisitorArrival)], function(err, result) {
+    console.log('All files done');
 });
 
 function performOnce(filePath, runObj, callback) {
