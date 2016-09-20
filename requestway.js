@@ -62,9 +62,59 @@ function runOvernightVisitorArrival(next) {
     });
 }
 
-async.series([async.apply(runSameDayVisitorArrival), async.apply(runOvernightVisitorArrival)], function(err, result) {
+/**Departure */
+function runDeparture(next) {
+    var runObjs = JSON.parse(fs.readFileSync('./cks/Departures.json').toString());
+    async.mapLimit(runObjs, 4, function (runObj, callback) {
+        var filePath = folder + 'Departures Visitor_' + runObj.country + '.xls'
+        performOnce(filePath, runObj, callback);
+    }, function (err) {
+        next();
+    });
+}
+
+/** China Visitor Total */
+function runChinaVisitor(next) {
+    var runObjs = JSON.parse(fs.readFileSync('./cks/ChinaVisitor_Total.json').toString());
+    async.mapLimit(runObjs, 1, function (runObj, callback) {
+        var filePath = folder + 'ChinaVisitor_Total.xls';
+        performOnce(filePath, runObj, callback);
+    }, function (err) {
+        next();
+    });
+}
+
+/** China Visitor IVS */
+function runChinaVisitorIVS(next) {
+    var runObjs = JSON.parse(fs.readFileSync('./cks/ChinaVisitor_IVS.json').toString());
+    async.mapLimit(runObjs, 1, function (runObj, callback) {
+        var filePath = folder + 'ChinaVisitor_IVS.xls';
+        performOnce(filePath, runObj, callback);
+    }, function (err) {
+        next();
+    });
+}
+
+/** LOS */
+function runLos(next) {
+    var runObjs = JSON.parse(fs.readFileSync('./cks/Los.json').toString());
+    async.mapLimit(runObjs, 1, function (runObj, callback) {
+        var filePath = folder + runObj.category + '.xls';
+        performOnce(filePath, runObj, callback);
+    }, function (err) {
+        next();
+    });
+}
+async.series([async.apply(runChinaVisitor)], function (err, result) {
     console.log('All files done');
 });
+
+// async.series([async.apply(runChinaVisitor), async.apply(runChinaVisitorIVS)], function (err, result) {
+//     console.log('All files done');
+// });
+// async.series([async.apply(runSameDayVisitorArrival), async.apply(runOvernightVisitorArrival), async.apply(runDeparture)], function (err, result) {
+//     console.log('All files done');
+// });
 
 function performOnce(filePath, runObj, callback) {
 
