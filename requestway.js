@@ -43,7 +43,7 @@ fs.mkdirSync(folder);
 /**Same day arrival visitors */
 function runSameDayVisitorArrival(next) {
     var runObjs = JSON.parse(fs.readFileSync('./cks/SameDayVisitor.json').toString());
-    async.mapLimit(runObjs, 3, function (runObj, callback) {
+    async.mapLimit(runObjs, 4, function (runObj, callback) {
         var filePath = folder + 'Same-Day Visitor_' + runObj.country + '.xls'
         performOnce(filePath, runObj, callback);
     }, function (err) {
@@ -54,7 +54,7 @@ function runSameDayVisitorArrival(next) {
 /**Overnight arrival visitors */
 function runOvernightVisitorArrival(next) {
     var runObjs = JSON.parse(fs.readFileSync('./cks/OvernightVisitor.json').toString());
-    async.mapLimit(runObjs, 3, function (runObj, callback) {
+    async.mapLimit(runObjs, 4, function (runObj, callback) {
         var filePath = folder + 'Overnight Visitor_' + runObj.country + '.xls'
         performOnce(filePath, runObj, callback);
     }, function (err) {
@@ -121,8 +121,8 @@ function performOnce(filePath, runObj, callback) {
     var orientation_clientState = { clientplcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_RadComboBoxPaperOrientation_ClientState: { "logEntries": [], "value": "PORTRAIT", "text": "Portrait", "enabled": true } };
     var chartSeriesType_clientState = { plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_RadComboBoxChartSeriesType_ClientState: { "logEntries": [], "value": "LINE", "text": "Line Chart", "enabled": false } };
     var outputType = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$Data: 'rdoDataByLatestRecords' };
-    var mos = { plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_txtDataLatestRecords_text: 24 };
-    var mos1 = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$txtDataLatestRecords: 24 };
+    var mos = { plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_txtDataLatestRecords_text: 12 };
+    var mos1 = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$txtDataLatestRecords: 12 };
     var monthly = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$chkMonthlyDataPeriod: 'on' };
     var event_beforeConfiguration = { __EVENTTARGET: 'plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$StepNavigationTemplateContainerID$StepNextLinkButton' };
     var eventarg_beforeConfiguration = { __EVENTARGUMENT: '' };
