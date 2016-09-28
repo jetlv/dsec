@@ -3,7 +3,26 @@
 var fs = require('fs');
 var xlsx = require('node-xlsx');
 var async = require('async');
-
+/**
+ * Date extension
+ */
+Date.prototype.Format = function (fmt) {
+    var o = {
+        "M+": this.getMonth() + 1,
+        "d+": this.getDate(),
+        "h+": this.getHours(),
+        "m+": this.getMinutes(),
+        "s+": this.getSeconds(),
+        "q+": Math.floor((this.getMonth() + 3) / 3),
+        "S": this.getMilliseconds()
+    };
+    if (/(y+)/.test(fmt))
+        fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt))
+            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
 
 module.exports = function (folder, callback) {
 
@@ -21,7 +40,7 @@ module.exports = function (folder, callback) {
     }
 
     async.waterfall([async.apply(compose_data_arrival), async.apply(compose_data_departures), async.apply(compose_data_china), async.apply(composeLos)], function (err, result) {
-
+        console.log('All things done');
     });
 
     /** sheet - V_DATA_ARRIVALS*/
@@ -66,7 +85,7 @@ module.exports = function (folder, callback) {
                 type = 'OVERNIGHT';
             }
             /** read sheet */
-            console.log(folder + file);
+            // console.log(folder + file);
             var VisotorSheet = xlsx.parse(fs.readFileSync(folder + file))[1].data;
             var currentYear = '';
             VisotorSheet.forEach(function (line, index, array) {
@@ -91,7 +110,7 @@ module.exports = function (folder, callback) {
                     { ci: 14, mode_arr: 'AIR', entry: 'Airport' },
                     { ci: 16, mode_arr: 'AIR', entry: 'Heliport' },]
 
-                var chinaArrival = 0;
+                // var chinaArrival = 0;
                 maps.forEach(function (item, index, array) {
                     var row = [];
                     var entry = item.entry;
@@ -99,15 +118,26 @@ module.exports = function (folder, callback) {
                     var arrivals = line[item.ci];
                     /** for non-ivs */
                     if (residence == 'Mainland China') {
-                        chinaArrival += arrivals;
+                        if (nonIvsObj[dt.Format('yyyyMMdd') + '_' + type] == undefined) {
+                            nonIvsObj[dt.Format('yyyyMMdd') + '_' + type] = parseInt(arrivals);
+                        } else {
+                            if (arrivals > 0) {
+                                nonIvsObj[dt.Format('yyyyMMdd') + '_' + type] = nonIvsObj[dt.Format('yyyyMMdd') + '_' + type] + parseInt(arrivals);
+                                // if (dt.Format('yyyyMMdd') == '20150101') {
+                                //     console.log(dt.Format('yyyyMMdd') + '_' + type + ' -> ' + arrivals);
+                                // }
+                            }
+                        }
                     }
                     row.push(dt, type, entry, mode, residence, arrivals);
                     rows.push(row);
                 });
-                nonIvsObj[dt + '_' + type] = chinaArrival;
+                // console.log(chinaArrival);
+                // nonIvsObj[dt.Format('yyyyMMdd') + '_' + type] = chinaArrival;
             });
 
         });
+
         callback(null, { sheet: [V_DATA_ARRIVALS], chinaTotal: nonIvsObj });
     }
 
@@ -169,8 +199,11 @@ module.exports = function (folder, callback) {
 
     /** sheet - V_DATA_CHINA */
     function compose_data_china(context, callback) {
+
+        // console.log(JSON.stringify(context.chinaTotal));
+
         /** cities define */
-        var cities = ["Total", "Guangdong", "Fujian", "Zhejiang", "Hunan", "Jiangsu", "Henan", "Sichuan", "Beijing", "Shangai", "Tianjin", "Chongqing", "Hubei", "Guangxi", "Jiangxi", "Liaoning", "Anhui", "Shandong", "Hebei", "Jilin"];
+        var cities = ["Total", "Guangdong", "Fujian", "Zhejiang", "Hunan", "Jiangsu", "Henan", "Sichuan", "Beijing", "Shangai", "Tianjin", "Chongqing", "Hubei", "Guangxi", "Jiangxi", "Liaoning", "Anhui", "Shanxi", "Shandong", "Helongjiang", "Hebei", "Shaanxi", "Inner Mongolia", "Jilin"];
         var totalFile = folder + 'ChinaVisitor_Total.xls';
         var ivsFile = folder + 'ChinaVisitor_IVS.xls';
 
@@ -184,9 +217,15 @@ module.exports = function (folder, callback) {
         var ivsSheet = xlsx.parse(fs.readFileSync(ivsFile))[1].data;
 
         var currentYear = '';
+        var existingCities;
         ivsSheet.forEach(function (line, index, array) {
             if (index === 0) {
                 return;
+            }
+            if (index === 8) {
+                existingCities = line;
+                existingCities.push("Total");
+                // console.log(existingCities.length + ' <- This is existing cities length');
             }
             if ((!line[1]) || (line[1] && (!_m(line[1])))) {
                 return;
@@ -194,11 +233,13 @@ module.exports = function (folder, callback) {
             if (line[0] && line[0].match(/\d+/)) {
                 currentYear = line[0];
             }
+            /** temporarily using Guangdong as identifier  */
 
             var dt = new Date(Date.UTC(currentYear, parseInt(_m(line[1])) - 1, 1, 0, 0, 0, 0));
 
             /** Define ivs global total per row  */
             var cTotal = line[2];
+            // console.log(cTotal);
             var subTotal = 0;
 
             /** define non-ivs total - china total not including "others"*/
@@ -207,17 +248,25 @@ module.exports = function (folder, callback) {
             /** get IVS rows, per city per line */
             var iCategory = "IVS";
             var nCatrgory = "Non-IVS";
+            /** define offset - process non existing data */
+            var offset = 0;
             cities.forEach(function (city, cityIndex, array) {
+                var notExisting = false;;
                 if (cityIndex == 0) {
                     return;
+                }
+                if (existingCities.indexOf(city) === -1) {
+                    // console.log(city + ' is not existing');
+                    offset += 2;
+                    notExisting = true;
                 }
                 var row = [];
                 var nRow = [];
                 var province = city;
-                var arrivals = line[2 * (cityIndex + 1)];
+                var arrivals = notExisting ? 0 : line[2 * (cityIndex + 1) - offset];
                 var totalArrivals = totalSheet[index][2 * (cityIndex + 1)];
                 if (cityIndex > 9) {
-                    arrivals = line[2 * (cityIndex + 1) + 1];
+                    arrivals = notExisting ? 0 : line[2 * (cityIndex + 1) + 1 - offset];
                     totalArrivals = totalSheet[index][2 * (cityIndex + 1) + 1];
                 }
                 /** plus provinces for IVS */
@@ -233,11 +282,15 @@ module.exports = function (folder, callback) {
             });
             /** caculate ivs 'Other' for current line */
             var oArrivals = cTotal - subTotal;
+            // console.log('subTotal - ' + subTotal);
             var oRow = [dt, iCategory, "Other", oArrivals];
             rows.push(oRow);
 
             /** caculate non-ivs 'Other' for current line */
-            var chinaTotal = parseInt(context.chinaTotal[dt + '_SAME-DAY']) + parseInt(context.chinaTotal[dt + '_OVERNIGHT']);
+            var chinaTotal = parseInt(context.chinaTotal[dt.Format('yyyyMMdd') + '_SAME-DAY']) + parseInt(context.chinaTotal[dt.Format('yyyyMMdd') + '_OVERNIGHT']);
+            // console.log('Same-Day - ' + parseInt(context.chinaTotal[dt.Format('yyyyMMdd') + '_SAME-DAY']));
+            // console.log('OVERNIGHT - ' + parseInt(context.chinaTotal[dt.Format('yyyyMMdd') + '_OVERNIGHT']));
+            // console.log(chinaTotal);
             var otherNonIvsArrivals = chinaTotal - cTotal - non_ivsTotal;
             var nonIvsOtherRow = [dt, nCatrgory, "Other", otherNonIvsArrivals];
             rows.push(nonIvsOtherRow);
@@ -292,12 +345,12 @@ module.exports = function (folder, callback) {
         }
 
         pushSingleSheet(allSheet, 'Total');
-        pushSingleSheet(overnightSheet, 'Same-Day');
-        pushSingleSheet(sameDaySheet, 'Overnight');
+        pushSingleSheet(overnightSheet, 'Overnight');
+        pushSingleSheet(sameDaySheet, 'Same-Day');
 
         context.sheet.push(V_DATA_LOS);
 
-        fs.writeFile(folder + '/' + 'Output Template - DSEC Visitation.xlsx', xlsx.build(context.sheet), function (err) {
+        fs.writeFile(folder + '/' + 'DSEC Visitation Data.xlsx', xlsx.build(context.sheet), function (err) {
             if (err) console.log(err);
             callback(null);
         });

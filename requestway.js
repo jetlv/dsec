@@ -4,6 +4,9 @@ var request = require('request');
 var cheerio = require('cheerio');
 var fs = require('fs');
 var async = require('async');
+var processor = require('./processor_p2.js');
+var config = JSON.parse(fs.readFileSync('config.json').toString());
+var ew = require('node-xlsx');
 
 /**
  * Date extension
@@ -40,36 +43,80 @@ var __getSessions = function (resp) {
 
 var folder = new Date().Format('yyyyMMddhhmmss') + '/';
 fs.mkdirSync(folder);
+/** run series */
+async.series([async.apply(runSameDayVisitorArrival), async.apply(runOvernightVisitorArrival), async.apply(runDeparture), async.apply(runChinaVisitor), async.apply(runChinaVisitorIVS), async.apply(runLos), async.apply(processor, [folder])], function (err, result) {
+    console.log('All files downloaded');
+});
+
+// async.series([async.apply(processor, ['20160928144223/'])], function (err, result) {
+//     console.log('All files downloaded');
+// });
+
+
+/** fixing method */
+function fixing(runObjs, prefix, fullName, next) {
+    /** if fullName exists, won't use prfix' */
+    var errorObjs = [];
+    runObjs.forEach(function (runObj, index, array) {
+        var fp = '';
+        try {
+            if (prefix === 'category') {
+                fp = folder + runObj.category + '.xls';
+            } else {
+                fp = fullName ? (folder + fullName) : (folder + prefix + runObj.country + '.xls');
+            }
+            ew.parse(fs.readFileSync(fp));
+        } catch (e) {
+            /** catched error means not a correct excel */
+            errorObjs.push(runObj)
+        }
+    });
+
+    if (errorObjs.length === 0) {
+        next();
+    } else {
+        async.mapLimit(errorObjs, 1, function (runObj, callback) {
+            var filePath = fullName ? (folder + fullName) : (folder + prefix + runObj.country + '.xls');
+            console.log('Fixing ' + filePath);
+            performOnce(filePath, runObj, callback);
+        }, function (err) {
+            console.log('err checking done, ' + errorObjs.length + ' items fixed');
+            fixing(runObjs, prefix, fullName, next);
+        });
+    }
+}
+
 /**Same day arrival visitors */
 function runSameDayVisitorArrival(next) {
     var runObjs = JSON.parse(fs.readFileSync('./cks/SameDayVisitor.json').toString());
-    async.mapLimit(runObjs, 4, function (runObj, callback) {
+    async.mapLimit(runObjs, config.threads, function (runObj, callback) {
         var filePath = folder + 'Same-Day Visitor_' + runObj.country + '.xls'
         performOnce(filePath, runObj, callback);
     }, function (err) {
-        next();
+        /** check and refetch */
+        fixing(runObjs, 'Same-Day Visitor_', null, next);
     });
 }
 
 /**Overnight arrival visitors */
 function runOvernightVisitorArrival(next) {
     var runObjs = JSON.parse(fs.readFileSync('./cks/OvernightVisitor.json').toString());
-    async.mapLimit(runObjs, 4, function (runObj, callback) {
+    async.mapLimit(runObjs, config.threads, function (runObj, callback) {
         var filePath = folder + 'Overnight Visitor_' + runObj.country + '.xls'
         performOnce(filePath, runObj, callback);
     }, function (err) {
-        next();
+        fixing(runObjs, 'Overnight Visitor_', null, next);
     });
 }
 
 /**Departure */
 function runDeparture(next) {
     var runObjs = JSON.parse(fs.readFileSync('./cks/Departures.json').toString());
-    async.mapLimit(runObjs, 4, function (runObj, callback) {
-        var filePath = folder + 'Departures Visitor_' + runObj.country + '.xls'
+    async.mapLimit(runObjs, config.threads, function (runObj, callback) {
+        var filePath = folder + 'Departures Visitor_' + runObj.country + '.xls';
         performOnce(filePath, runObj, callback);
     }, function (err) {
-        next();
+        fixing(runObjs, 'Departures Visitor_', null, next);
     });
 }
 
@@ -80,7 +127,7 @@ function runChinaVisitor(next) {
         var filePath = folder + 'ChinaVisitor_Total.xls';
         performOnce(filePath, runObj, callback);
     }, function (err) {
-        next();
+        fixing(runObjs, '', 'ChinaVisitor_Total.xls', next);
     });
 }
 
@@ -91,7 +138,7 @@ function runChinaVisitorIVS(next) {
         var filePath = folder + 'ChinaVisitor_IVS.xls';
         performOnce(filePath, runObj, callback);
     }, function (err) {
-        next();
+        fixing(runObjs, '', 'ChinaVisitor_IVS.xls', next);
     });
 }
 
@@ -102,19 +149,9 @@ function runLos(next) {
         var filePath = folder + runObj.category + '.xls';
         performOnce(filePath, runObj, callback);
     }, function (err) {
-        next();
+        fixing(runObjs, 'category', null, next);
     });
 }
-async.series([async.apply(runChinaVisitor)], function (err, result) {
-    console.log('All files done');
-});
-
-// async.series([async.apply(runChinaVisitor), async.apply(runChinaVisitorIVS)], function (err, result) {
-//     console.log('All files done');
-// });
-// async.series([async.apply(runSameDayVisitorArrival), async.apply(runOvernightVisitorArrival), async.apply(runDeparture)], function (err, result) {
-//     console.log('All files done');
-// });
 
 function performOnce(filePath, runObj, callback) {
 
@@ -171,8 +208,8 @@ function performOnce(filePath, runObj, callback) {
     var orientation_clientState = { clientplcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_RadComboBoxPaperOrientation_ClientState: { "logEntries": [], "value": "PORTRAIT", "text": "Portrait", "enabled": true } };
     var chartSeriesType_clientState = { plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_RadComboBoxChartSeriesType_ClientState: { "logEntries": [], "value": "LINE", "text": "Line Chart", "enabled": false } };
     var outputType = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$Data: 'rdoDataByLatestRecords' };
-    var mos = { plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_txtDataLatestRecords_text: 12 };
-    var mos1 = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$txtDataLatestRecords: 12 };
+    var mos = { plcRoot_Layout_zoneContent_pageplaceholder_partPlaceholder_Layout_zoneMain_CustomReport_Wizard1_txtDataLatestRecords_text: parseInt(config.mos) };
+    var mos1 = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$txtDataLatestRecords: parseInt(config.mos) };
     var monthly = { plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$chkMonthlyDataPeriod: 'on' };
     var event_beforeConfiguration = { __EVENTTARGET: 'plcRoot$Layout$zoneContent$pageplaceholder$partPlaceholder$Layout$zoneMain$CustomReport$Wizard1$StepNavigationTemplateContainerID$StepNextLinkButton' };
     var eventarg_beforeConfiguration = { __EVENTARGUMENT: '' };
